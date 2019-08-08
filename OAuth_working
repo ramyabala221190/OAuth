@@ -1,0 +1,278 @@
+OAuth 2(Open protocol Authorisation):
+
+It’s important to understand how a program, website, or app might authenticate 
+you as a user – do they have the right permissions? 
+Have you granted them some sort of way of verifying who you are – and accessing 
+data on your behalf? 
+OAuth helps streamline this process: but even with automation, always be aware of 
+how a person or company uses (or stores) your data.
+
+
+For example, you can tell Facebook that it’s OK for ESPN.com to access your 
+profile or post updates to your timeline without having to give ESPN your 
+Facebook password. This minimizes risk in a major way: In the event ESPN suffers
+a breach, your Facebook password remains safe.
+
+OAuth doesn’t share password data but instead uses authorization tokens to prove 
+an identity between consumers and service providers. OAuth is an authentication 
+protocol that allows you to approve one application interacting with another on 
+your behalf without giving away your password.
+
+OAuth is about authorization and not authentication. Authorization is asking 
+for permission to do stuff. Authentication is about proving you are the correct 
+person because you know things. OAuth doesn’t pass authentication data between 
+consumers and service providers – but instead acts as an authorization token of 
+sorts.
+
+
+We have 4 players here:
+1.User/Resource owner:The resource owner is the user who authorizes a client application to 
+access their account. The application's access to the user's account is limited to the 
+"scope" of the authorization granted (e.g. read or write access).
+
+2.Resource server storing user's account data.
+
+3.Client:The client is the application that wants to access the user's account. 
+
+4.Authorisation server-It grants authorisation to the
+Client Application to access user data from Resource server by granting token.
+It verifies the user's identity before granting token to application.
+
+1. The application requests authorization to access service resources from the user
+If the user authorized the request, the application receives an authorization grant
+
+2.The application requests an access token from the authorization server (API) by 
+presenting authentication of its own identity, and the authorization grant
+
+3.If the application identity is authenticated and the authorization grant is valid, 
+the authorization server (API) issues an access token to the application. 
+Authorization is complete.
+
+4.The application requests the resource from the resource server (API) and presents the 
+access token for authentication.
+
+5.If the access token is valid, the resource server (API) serves the resource to the 
+application
+
+The actual flow of this process will differ depending on the authorization grant type in 
+use, but this is the general idea.
+
+-----------------------------------------------------
+
+Before using OAuth with your application, you must register your 
+application with the service(Auth server). 
+
+This is done through a registration form in the "developer" or "API" portion of the 
+service's website, where you will provide the following information 
+(and probably details about your application):
+
+Application Name
+Application Website
+Redirect URI or Callback URL
+
+The redirect URI is where the service will redirect the user after they 
+authorize (or deny) your application, and therefore the part of your application 
+that will handle authorization codes or access tokens.
+
+Client ID and Client Secret
+
+Once your application is registered, the service will issue "client credentials" in 
+the form of a client identifier and a client secret. 
+
+The Client ID is a publicly exposed string that is used by the service API to identify 
+the application, and is also used to build authorization URLs that are presented to users. 
+
+The Client Secret is used to authenticate the identity of the application to the service 
+API when the application requests to access a user's account, and must be kept private 
+between the application and the API.
+
+-----------------------------------------------------------------
+
+Auth Grant
+
+The authorization grant type depends on the method used by the application to request 
+authorization, and the grant types supported by the API. 
+
+OAuth 2 defines four grant types, each of which is useful in different cases:
+
+1.Authorization Code: used with server-side Applications
+
+2.Implicit: used with Mobile Apps or Web Applications (applications that run on the user's 
+device)
+
+3.Resource Owner Password Credentials: used with trusted Applications, such as those owned 
+by the service itself
+
+4.Client Credentials: used with Applications API access
+
+I.Grant Type: Authorization Code
+
+Assume the client is an application:Thedropletbook App and the Auth Server is
+cloud.digitalocean.com
+
+1.First, the user is given an authorization code link that looks like the following:
+https://cloud.digitalocean.com/v1/oauth/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=CALLBACK_URL&scope=read
+
+Here is an explanation of the link components:
+
+https://cloud.digitalocean.com/v1/oauth/authorize: the API(Auth server) authorization endpoint
+
+client_id=client_id: the application's client ID (how the API identifies the application)
+
+redirect_uri=CALLBACK_URL: where the service redirects the user-agent after an authorization code is granted
+
+response_type=code: specifies that your application is requesting an authorization code grant
+
+scope=read: specifies the level of access that the application is requesting
+
+2.When the user clicks the link, they must first log in to the service(Auth server), 
+to authenticate their identity (unless they are already logged in) to the Auth server.
+
+Then they will be prompted by the service to authorize or deny the application access to 
+their account. 
+
+3.If the user authorizes, the service redirects the browser to the application 
+redirect URI, which was specified during the client registration, along with an 
+authorization code. 
+
+The redirect would look something like this (assuming the application is "dropletbook.com"):
+
+https://dropletbook.com/callback?code=AUTHORIZATION_CODE
+
+4.The application requests an access token from the API(Auth server), by passing the authorization 
+code along with authentication details, including the client secret, to the API token 
+endpoint. Here is an example POST request to DigitalOcean's token endpoint:
+
+https://cloud.digitalocean.com/v1/oauth/token?client_id=CLIENT_ID&client_secret=CLIENT_SECRET&grant_type=authorization_code&code=AUTHORIZATION_CODE&redirect_uri=CALLBACK_URL
+
+5.If the authorization is valid, the API will send a response containing the access token 
+(and optionally, a refresh token) to the application. 
+
+The entire response will look something like this:
+
+{"access_token":"ACCESS_TOKEN","token_type":"bearer","expires_in":2592000,"refresh_token":"REFRESH_TOKEN","scope":"read","uid":100101,"info":{"name":"Mark E. Mark","email":"mark@thefunkybunch.com"}}
+
+
+Now the application is authorized! It may use the token to access the user's account from
+the Resource server via the service API, limited to the scope of access, until the token expires or is revoked. 
+If a refresh token was issued, it may be used to request new access tokens if the original 
+token has expired.
+
+eg:GitHub Oath App
+
+Refer to https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/
+
+You need to first register your appln with GitHub at https://github.com/settings/applications/new
+Below details are requested:
+
+Application name:OAuthTest1992
+Redirect URL:http://localhost:8080/OAuthTest1992Redirect
+Application Home page:http://localhost:8080/OAuthHome
+
+Once you give these details they will provide Client ID and secret.
+
+Implemented using Nodejs And Node+Angular. The difference between the 2 is whether node or angular handles the calls to Git.
+
+
+Node+Angular:
+
+Here the public and views folder and testindex.js not involved at all.
+Just index.js and the src folder.
+We need to start both node and angular dev servers.
+
+Node:
+
+Here src folder not involved.Only public and views folder and testindex.js.
+What is important here in testindex.js is:
+
+Adding https://cors-anywhere.herokuapp.com before 
+https://github.com/login/oauth/access_token?client_id='+envconfig.CLIENT_ID+'&client_secret='+envconfig.CLIENT_SECRET+'&code='+req.query.code
+
+The github url doesnt include Access-control-allow-origin in the response headers. So although POST is
+successful, it fails at the browser when it doesnt detect the header.
+That is the reason we need to add this proxy url which adds the header with the value * and avoids the error.
+
+So your  node+angular/just node appln is the client application which is first asking the user
+if it would like to login via Github.
+If yes,you will be taken to the below page if session expired:
+
+https://github.com/login/oauth/authorize?client_id='+CLIENT_ID+'&redirect_uri='+REDIRECT_URL
+
+After successful login, git will redirect back to http://localhost:8080/OAuthTest1992Redirect
+along with a code.
+
+The application needs to use this code,client id and secret to make a post request to GitHub
+to obtain the access token
+
+https://github.com/login/oauth/access_token?client_id='+client_id+'&client_secret='+client_secret+'&code='+client_code
+
+The token received in response can be used by the application to access the API's offerred
+by GitHub to retrieve desired user details.
+
+The application has sent a GET request to https://api.github.com/user with the Authorisation
+header containing the token.
+A json response containing the user details is received by the application.
+
+II.Grant Type: Resource Owner Password Credentials
+With the resource owner password credentials grant type, the user provides their service 
+credentials (username and password) directly to the application, which uses the 
+credentials to obtain an access token from the service. This grant type should only be 
+enabled on the authorization server if other flows are not viable. 
+Also, it should only be used if the application is trusted by the user 
+(e.g. it is owned by the service, or the user's desktop OS).
+
+Password Credentials Flow
+After the user gives their credentials to the application, the application will 
+then request an access token from the authorization server. The POST request might look 
+something like this:
+
+https://oauth.example.com/token?grant_type=password&username=USERNAME&password=PASSWORD&client_id=CLIENT_ID
+
+If the user credentials check out, the authorization server returns an access token to 
+the application. Now the application is authorized!
+
+III.Grant Type: Client Credentials
+The client credentials grant type provides an application a way to access its own service 
+account. Examples of when this might be useful include if an application wants to 
+update its registered description or redirect URI, or access other data stored in its 
+service account via the API.
+
+Client Credentials Flow
+The application requests an access token by sending its credentials, its client ID and 
+client secret, to the authorization server. An example POST request might look like the 
+following:
+
+https://oauth.example.com/token?grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET
+
+If the application credentials check out, the authorization server returns an access 
+token to the application. Now the application is authorized to use its own account!
+
+IV.Grant Type: Implicit
+
+1.With the implicit grant type, the user is presented with an authorization link, that 
+requests a token from the API. This link looks just like the authorization code link, 
+except it is requesting a token instead of a code (note the response type "token"):
+
+https://cloud.digitalocean.com/v1/oauth/authorize?response_type=token&client_id=CLIENT_ID&redirect_uri=CALLBACK_URL&scope=read
+
+2.When the user clicks the link, they must first log in to the service(Auth server), 
+to authenticate their identity (unless they are already logged in). 
+Then they will be prompted by the service to authorize or deny the application access 
+to their account. 
+
+3.If the user authorises, the service(Auth server) redirects the browser to the application
+redirect URI, and includes a URI fragment containing the access token. 
+ 
+It would look something like this:
+
+https://dropletbook.com/callback#token=ACCESS_TOKEN
+
+4.The browser follows the redirect URI but retains the access token.
+The application returns a webpage that contains a script that can extract the access 
+token from the full redirect URI that the browser has retained.
+
+5.The browser executes the provided script and passes the extracted access token to the 
+application.
+
+Now the application is authorized! It may use the token to access the user's account 
+via the service API, limited to the scope of access, until the token expires or is revoked.

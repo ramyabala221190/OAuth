@@ -1,0 +1,43 @@
+<h2>User Details</h2>
+
+
+<script src="lib/jquery.min.js"></script>
+<script type="text/javascript">
+var url='<%=token_url%>';
+console.log(url);
+
+$.ajax({
+url:url,
+method:'POST',
+data:{},
+headers:{'Accept':'application/json'},
+success:function(data)
+{
+getUserDetails(data.access_token);
+},
+error:function(err)
+{
+    console.log(err);
+}
+})
+
+
+function getUserDetails(token)
+{
+$.ajax({
+url:'https://api.github.com/user',
+method:'GET',
+headers:{'Authorization': 'token ' + token},
+success:function(data)
+{
+console.log(data);
+},
+error:function(err)
+{
+    console.log(err);
+}
+})
+
+}
+
+</script>
